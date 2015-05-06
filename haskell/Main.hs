@@ -12,10 +12,10 @@ docopt-sample version 0.1.0
 
 Usage:
   docopt-sample cat <file>
-  docopt-sample echo [--caps] <string>
+  docopt-sample echo [--caps=<test>] <string>
 
 Options:
-  -c, --caps    Caps-lock the echoed argument
+  -c, --caps=<test>    Caps-lock the echoed argument
 |]
 
 getArgOrExit = getArgOrExitWith patterns
@@ -34,3 +34,6 @@ main = do
                         else id
     string <- args `getArgOrExit` (argument "string")
     putStrLn $ map charTransform string
+    when (args `isPresent` (longOption "caps")) $ do
+      a <- args `getArgOrExit` (argument "test")
+      putStrLn $ "arg for caps: " ++ a
