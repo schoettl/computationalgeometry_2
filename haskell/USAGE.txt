@@ -1,8 +1,0 @@
-usage:
-  area [ -p <pointfile> ] <areafile>
-  area [ -h ]
-
-options:
-  -p, --points=<pointfile>  for each point in this file,
-      test in which area it is and output the result
-  -h  print this help message
