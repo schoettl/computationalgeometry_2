@@ -35,5 +35,5 @@ main = do
     string <- args `getArgOrExit` (argument "string")
     putStrLn $ map charTransform string
     when (args `isPresent` (longOption "caps")) $ do
-      a <- args `getArgOrExit` (argument "test")
+      a <- args `getArgOrExit` (longOption "caps")
       putStrLn $ "arg for caps: " ++ a
