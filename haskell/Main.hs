@@ -1,27 +1,36 @@
 {-# LANGUAGE QuasiQuotes #-}
+module Main where
 
 import Control.Monad (when)
+import Data.Char (toUpper)
 import System.Environment (getArgs)
 import System.Console.Docopt
 
 patterns :: Docopt
 patterns = [docopt|
-usage:
-  area [ -p <pointfile> ] <areafile>
+docopt-sample version 0.1.0
 
-options:
-  -p, --points=<pointfile>  for each point in this file,
-      test in which area it is and output the result
+Usage:
+  docopt-sample cat <file>
+  docopt-sample echo [--caps] <string>
+
+Options:
+  -c, --caps    Caps-lock the echoed argument
 |]
 
 getArgOrExit = getArgOrExitWith patterns
 
+main :: IO ()
 main = do
   args <- parseArgsOrExit patterns =<< getArgs
 
-  areaFile <- getArgOrExit args (argument "areafile")
-  putStr =<< readFile areaFile -- = cat
+  when (args `isPresent` (command "cat")) $ do
+    file <- args `getArgOrExit` (argument "file")
+    putStr =<< readFile file
 
-  when (isPresent args (longOption "points")) $ do
-    pointFile <- getArgOrExit args (argument "pointfile")
-    putStrLn $ "--points is set: " ++ pointFile
+  when (args `isPresent` (command "echo")) $ do
+    let charTransform = if args `isPresent` (longOption "caps")
+                        then toUpper
+                        else id
+    string <- args `getArgOrExit` (argument "string")
+    putStrLn $ map charTransform string
