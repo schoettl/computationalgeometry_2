@@ -34,9 +34,10 @@ main = do
 
 
 data Point = Point { xCoord::Double, yCoord::Double } deriving (Show)
-data Area = Area { areaName::String, polygons::[[Point]] } deriving (Show)
+data Area = Area { areaName::AreaName, polygons::[[Point]] } deriving (Show)
 type UnparsedCommands = [(Char, [String])]
 type ParsedCommands = [(Char, Point)]
+type AreaName = String
 
 exampleData = "n abc\nM 1 2\nl 2 3\nL 1 2\nz\nM 1 2\nl 0 5\nz\nn efg\nM 0 0\nl 2 3\nz"
 
@@ -48,36 +49,68 @@ parseData = map (\(x:xs) -> (head x, xs))
 
 groupData :: [(Char, [String])] -> [(String, UnparsedCommands)]
 groupData list = let
-  names = map (last . snd) $ filter isName list
-  cmds  = tail $ splitWhen isName list
+      names = map (last . snd) $ filter isName list
+      cmds  = tail $ splitWhen isName list
   in zip names cmds
-  where isName (c, _) = c == 'n'
+    where isName (c, _) = c == 'n'
 
-splitPolygons :: [(String, UnparsedCommands)] -> [(String, [UnparsedCommands])]
+splitPolygons :: [(AreaName, UnparsedCommands)] -> [(AreaName, [UnparsedCommands])]
 splitPolygons = map (\(n, cmds) -> (n, endBy [('z', [])] cmds))
 
-d :: [(String, [[Point]])]
-d = (convert . splitPolygons . groupData . parseData . readData) exampleData
-
-areas :: [(String, [[Point]])] -> [Area]
-areas = map (\(s, l) -> Area { areaName = s, polygons = l })
-
-convert :: [(String, [UnparsedCommands])] -> [(String, [[Point]])]
+convert :: [(AreaName, [UnparsedCommands])] -> [(AreaName, [[Point]])]
 convert = map (\(s, l) -> (s, map convertSublist l))
+
+asAreas :: [(AreaName, [[Point]])] -> [Area]
+asAreas = map (\(s, l) -> Area { areaName = s, polygons = l })
 
 convertSublist :: UnparsedCommands -> [Point]
 convertSublist = interpreteList . convertToPoints
 
-convertToNumbers :: UnparsedCommands -> [(Char, [Double])]
-convertToNumbers = map (\(c, s) -> (c, map (read :: String -> Double) s))
-
 convertToPoints :: [(Char, [String])] -> ParsedCommands
-convertToPoints = map (\(c, d) -> (c, Point { xCoord= read $ d!!0 :: Double, yCoord=(read $ d!!1 :: Double) }))
+convertToPoints = map (\(c, d) ->
+        (c, Point { xCoord = read $ d!!0 :: Double
+                  , yCoord = read $ d!!1 :: Double
+                  }))
 
 interpreteList :: ParsedCommands -> [Point]
 interpreteList = foldl interpreteCommand []
   where interpreteCommand a (c, p) = a ++ [p']
-        p' = if c == 'l' then addPoints (last a) p else p
+          where p' = if c == 'l' then addPoints (last a) p else p
 
 addPoints :: Point -> Point -> Point
 addPoints p q = Point (xCoord p + xCoord q) (yCoord p + yCoord q)
+
+d :: [Area]
+d = (asAreas . convert . splitPolygons . groupData . parseData . readData) exampleData
+
+calculateAreaSizes :: [Area] -> [Double]
+calculateAreaSizes = map calculateSize
+
+calculateSize :: Area -> Double
+calculateSize Area {polygons=ps} = sum $ map calculatePolygonArea ps
+
+calculatePolygonArea :: [Point] -> Double
+calculatePolygonArea ps = fst $ foldl (\(s, p') p ->
+        (s + calculateTriangleSize p' p, p)) (0, head ps) (tail ps)
+
+calculateTriangleSize :: Point -> Point -> Double
+calculateTriangleSize p q = 0.5 * det p q
+
+det :: Point -> Point -> Double
+det p q = xCoord p * yCoord q - xCoord q * yCoord p
+
+testArea1 = Area { areaName = "Otterfing"
+                 , polygons = [
+                 [ Point { xCoord = 1, yCoord = 3 } -- ccw
+                 , Point { xCoord = 3, yCoord = 1 }
+                 , Point { xCoord = 5, yCoord = 3 }
+                 , Point { xCoord = 3, yCoord = 4 }
+                 , Point { xCoord = 2.5, yCoord = 5 }
+                 , Point { xCoord = 1, yCoord = 3 }
+                 ],
+                 [ Point { xCoord = 2, yCoord = 3 } -- cw
+                 , Point { xCoord = 3, yCoord = 3 }
+                 , Point { xCoord = 3, yCoord = 2 }
+                 , Point { xCoord = 2, yCoord = 3 }
+                 ]]}
+
