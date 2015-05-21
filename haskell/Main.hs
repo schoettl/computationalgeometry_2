@@ -83,18 +83,19 @@ addPoints p q = Point (xCoord p + xCoord q) (yCoord p + yCoord q)
 d :: [Area]
 d = (asAreas . convert . splitPolygons . groupData . parseData . readData) exampleData
 
-calculateAreaSizes :: [Area] -> [Double]
-calculateAreaSizes = map calculateSize
+calculateAllAreas :: [Area] -> [Double]
+calculateAllAreas = map calculateArea
 
-calculateSize :: Area -> Double
-calculateSize Area {polygons=ps} = sum $ map calculatePolygonArea ps
+calculateArea :: Area -> Double
+calculateArea Area {polygons=ps} = sum $ map calculatePolygonArea ps
 
 calculatePolygonArea :: [Point] -> Double
-calculatePolygonArea ps = fst $ foldl (\(s, p') p ->
-        (s + calculateTriangleSize p' p, p)) (0, head ps) (tail ps)
+calculatePolygonArea ps = abs $ fst $
+        foldl (\(s, p') p -> (s + calculateTriangleArea p' p, p))
+            (0, head ps) (tail ps)
 
-calculateTriangleSize :: Point -> Point -> Double
-calculateTriangleSize p q = 0.5 * det p q
+calculateTriangleArea :: Point -> Point -> Double
+calculateTriangleArea p q = 0.5 * det p q
 
 det :: Point -> Point -> Double
 det p q = xCoord p * yCoord q - xCoord q * yCoord p
@@ -114,3 +115,10 @@ testArea1 = Area { areaName = "Otterfing"
                  , Point { xCoord = 2, yCoord = 3 }
                  ]]}
 
+testArea2 = Area { areaName = "Jakobs Haus"
+                 , polygons = [
+                 [ Point { xCoord = 2, yCoord = 3 } -- cw
+                 , Point { xCoord = 3, yCoord = 3 }
+                 , Point { xCoord = 3, yCoord = 2 }
+                 , Point { xCoord = 2, yCoord = 3 }
+                 ]]}
