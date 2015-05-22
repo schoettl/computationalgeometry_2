@@ -10,11 +10,12 @@ patterns = [docopt|
 area version 1.0
 
 usage:
-  area [ -p <pointfile> ] <areafile>
+  area [-v] [ -p <pointfile> ] <areafile>
 
 options:
   -p, --points=<pointfile>  for each point in this file,
       test in which area it is and output the result
+  -v, --verbose  print the parsed Area data structure
 |]
 
 getArgOrExit = getArgOrExitWith patterns
@@ -26,6 +27,9 @@ main = do
   content <- readFile areaFile
   let areas = readAreas content
   mapM_ print $ calculateAllAreas areas
+
+  when (isPresent args (longOption "verbose")) $ do
+    print areas
 
   when (isPresent args (longOption "points")) $ do
     pointFile <- getArgOrExit args (longOption "points")
@@ -95,10 +99,10 @@ calculateAllAreas :: [Area] -> [Double]
 calculateAllAreas = map calculateArea
 
 calculateArea :: Area -> Double
-calculateArea Area {polygons=ps} = sum $ map calculatePolygonArea ps
+calculateArea Area {polygons=ps} = abs $ sum $ map calculatePolygonArea ps
 
 calculatePolygonArea :: [Point] -> Double
-calculatePolygonArea ps = abs $ fst $
+calculatePolygonArea ps = fst $
         foldl (\(s, p') p -> (s + calculateTriangleArea p' p, p))
             (0, head ps) (tail ps)
 
