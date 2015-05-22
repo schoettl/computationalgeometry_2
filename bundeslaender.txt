@@ -1,0 +1,17 @@
+Baden-Württemberg 35751.36
+Bayern 70550.23
+Berlin 891.70
+Brandenburg 29485.63
+Bremen 419.24
+Hamburg 755.30
+Hessen 21114.93
+Mecklenburg-Vorpommern 23210.55
+Niedersachsen 47613.78
+Nordrhein-Westfalen 34109.70
+Rheinland-Pfalz 19854.10
+Saarland 2568.70
+Sachsen 18420.01
+Sachsen-Anhalt 20450.64
+Schleswig-Holstein 15799.61
+Thüringen 16172.46
+Bundesrepublik_Deutschland 357167.94
