@@ -9,6 +9,7 @@ Jedem Koordinatenpaar ist ein Buchstabe vorangestellt:
  * `M`: move to (absolute)
  * `l`: line to (relative)
  * `L`: line to (absolute)
+ * `H`: horizontal line to (absolute) --dahinter steht nur eine Koordinate!
 
 Außerdem gibt es:
 
@@ -38,3 +39,6 @@ von Area minus 1 als x, y-Wert des fraglichen Punktes als y.
 
 Das geht aber nur, wenn keine zwei Ecken von Polygonkanten beide 0 als y-Koordinate haben!
 Sonst schneidet die Verbindungsstrecke möglicherweise die Kante auf voller Länge, dann ist keine Aussage möglich.
+
+
+$ awk -v s="$(awk '/Bayern/{print $2}' bundeslaender.txt)" '{print $1, $2/s}' bundeslaender.txt

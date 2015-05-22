@@ -25,13 +25,7 @@ main = do
   areaFile <- getArgOrExit args (argument "areafile")
   content <- readFile areaFile
   let areas = readAreas content
-  --putStr content
-  print $ length areas
-  print areas
-  --print (asAreas . convert . splitPolygons . groupData . parseData . readData) content
-  -- folgendes geht, beim convert (read) gibt's aber iwo probleme
-  print $ (splitPolygons . groupData . parseData . readData) content
-  --print $ calculateAllAreas areas
+  mapM_ print $ calculateAllAreas areas
 
   when (isPresent args (longOption "points")) $ do
     pointFile <- getArgOrExit args (longOption "points")
@@ -82,7 +76,11 @@ convertToPoints = map (\(c, d) ->
 interpreteList :: ParsedCommands -> [Point]
 interpreteList = foldl interpreteCommand []
   where interpreteCommand a (c, p) = a ++ [p']
-          where p' = if c == 'l' then addPoints (last a) p else p
+          where p'
+                  | c == 'l'  = addPoints (last a) p
+                  | c == 'H'  = Point { xCoord = xCoord p
+                                      , yCoord = yCoord (last a) }
+                  | otherwise = p
 
 addPoints :: Point -> Point -> Point
 addPoints p q = Point (xCoord p + xCoord q) (yCoord p + yCoord q)
