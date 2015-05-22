@@ -23,3 +23,18 @@ Großbuchstabe bedeutet also "absolute", Kleinbuchstabe bedeutet "relative" Bewe
  * nach `L` ist entweder `l` oder `z`
  * wenn nach `z` nicht Ende ist, heißt das wohl, dass in der Mitte des Polygon ein
    Stück herausgeschnitten wird
+
+Inside-polygon Test
+-------------------
+
+Wir nehmen einen Punkt außerhalb, und schauen wieviele Schnittpunkte
+die Verbindungslinie zum fraglichen Punkt mit einer Area hat.
+
+ * Gerade Anzahl -> liegt nicht in Area
+ * Ungerade Anzahl -> liegt in Area
+
+Welchen Punkt wählen wir außerhalb?  Minimaler x-Wert aller Polygonpunkte
+von Area minus 1 als x, y-Wert des fraglichen Punktes als y.
+
+Das geht aber nur, wenn keine zwei Ecken von Polygonkanten beide 0 als y-Koordinate haben!
+Sonst schneidet die Verbindungsstrecke möglicherweise die Kante auf voller Länge, dann ist keine Aussage möglich.

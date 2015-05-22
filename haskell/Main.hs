@@ -24,7 +24,14 @@ main = do
 
   areaFile <- getArgOrExit args (argument "areafile")
   content <- readFile areaFile
-  putStr content
+  let areas = readAreas content
+  --putStr content
+  print $ length areas
+  print areas
+  --print (asAreas . convert . splitPolygons . groupData . parseData . readData) content
+  -- folgendes geht, beim convert (read) gibt's aber iwo probleme
+  print $ (splitPolygons . groupData . parseData . readData) content
+  --print $ calculateAllAreas areas
 
   when (isPresent args (longOption "points")) $ do
     pointFile <- getArgOrExit args (longOption "points")
@@ -32,12 +39,12 @@ main = do
 
 
 
-
-data Point = Point { xCoord::Double, yCoord::Double } deriving (Show)
-data Area = Area { areaName::AreaName, polygons::[[Point]] } deriving (Show)
 type UnparsedCommands = [(Char, [String])]
 type ParsedCommands = [(Char, Point)]
 type AreaName = String
+
+data Point = Point { xCoord::Double, yCoord::Double } deriving (Show)
+data Area = Area { areaName::AreaName, polygons::[[Point]] } deriving (Show)
 
 exampleData = "n abc\nM 1 2\nl 2 3\nL 1 2\nz\nM 1 2\nl 0 5\nz\nn efg\nM 0 0\nl 2 3\nz"
 
@@ -82,6 +89,9 @@ addPoints p q = Point (xCoord p + xCoord q) (yCoord p + yCoord q)
 
 d :: [Area]
 d = (asAreas . convert . splitPolygons . groupData . parseData . readData) exampleData
+
+readAreas :: String -> [Area]
+readAreas = asAreas . convert . splitPolygons . groupData . parseData . readData
 
 calculateAllAreas :: [Area] -> [Double]
 calculateAllAreas = map calculateArea
