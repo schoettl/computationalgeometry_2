@@ -135,3 +135,24 @@ testArea2 = Area { areaName = "Jakobs Haus"
                  , Point { xCoord = 3, yCoord = 2 }
                  , Point { xCoord = 2, yCoord = 3 }
                  ]]}
+
+
+minX :: Polygon -> Double
+minX ps@(p:_) = foldr (\(Point {xCoord=x}) a -> min x a) (xCoord p) ps
+
+minXOfArea :: Area -> Double
+minXOfArea Area {polygons=ps} = minimum $ map minX ps
+
+containsPoint :: Area -> Point -> Bool
+containsPoint a@(Area {polygons=polygons}) p = odd $ sum $ map (flip numberOfIntersects line) polygons
+  where line = (Point { xCoord = minXOfArea a - 1, yCoord = yCoord p }, p)
+
+numberOfIntersects :: Polygon -> Line -> Int
+numberOfIntersects polygon line = count (==True) $
+    map (intersect line) $ toLines polygon
+
+toLines :: Polygon -> [Line]
+toLines ps@(_:ps') = zip ps ps'
+
+count :: (a -> Bool) -> [a] -> Int
+count pred = length . filter pred
