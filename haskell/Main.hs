@@ -6,10 +6,10 @@ import System.Console.Docopt
 import Data.List.Split
 import CG.Basic
 import CG.Intersect (intersect)
+import CG.Polygon (calculatePolygonArea, numberOfIntersects)
 
 patterns :: Docopt
-patterns = [docopt|
-area version 1.0
+patterns = [docopt|area version 1.0
 
 usage:
   area [-v] [ -p <pointfile> ] <areafile>
@@ -100,18 +100,8 @@ calculateAllAreas :: [Area] -> [Double]
 calculateAllAreas = map calculateArea
 
 calculateArea :: Area -> Double
-calculateArea Area {polygons=ps} = abs $ sum $ map calculatePolygonArea ps
+calculateArea Area{polygons=ps} = abs $ sum $ map calculatePolygonArea ps
 
-calculatePolygonArea :: [Point] -> Double
-calculatePolygonArea ps = fst $
-        foldl (\(s, p') p -> (s + calculateTriangleArea p' p, p))
-            (0, head ps) (tail ps)
-
-calculateTriangleArea :: Point -> Point -> Double
-calculateTriangleArea p q = 0.5 * det p q
-
-det :: Point -> Point -> Double
-det p q = xCoord p * yCoord q - xCoord q * yCoord p
 
 testArea1 = Area { areaName = "Otterfing"
                  , polygons = [
@@ -138,27 +128,12 @@ testArea2 = Area { areaName = "Jakobs Haus"
 
 
 minX :: Polygon -> Double
-minX ps@(p:_) = foldr (\(Point {xCoord=x}) a -> min x a) (xCoord p) ps
+minX ps@(p:_) = foldr (\Point{xCoord=x} a -> min x a) (xCoord p) ps
 
 minXOfArea :: Area -> Double
-minXOfArea Area {polygons=ps} = minimum $ map minX ps
+minXOfArea Area{polygons=ps} = minimum $ map minX ps
 
 containsPoint :: Area -> Point -> Bool
-containsPoint a@(Area {polygons=polygons}) p = odd $ sum $ map (flip numberOfIntersects line) polygons
+containsPoint a@(Area{polygons=polygons}) p = odd $ sum $ map (flip numberOfIntersects line) polygons
   where line = (Point { xCoord = minXOfArea a - 1, yCoord = yCoord p }, p)
 
-numberOfIntersects :: Polygon -> Line -> Int
-numberOfIntersects polygon line = count (==True) $
-    map (intersect line) $ toLines polygon
-
-toLines :: Polygon -> [Line]
-toLines ps@(_:ps') = zip ps ps'
-
-count :: (a -> Bool) -> [a] -> Int
-count pred = length . filter pred
-
-isHorizontalLineAtY :: Polygon -> Double -> Bool
-isHorizontalLineAtY ps y = foldr f False $ toLines ps
-  where
-    f :: Line -> Bool -> Bool
-    f (Point{yCoord=y1}, Point{yCoord=y2}) a = a || y == y1 && y1 == y2
