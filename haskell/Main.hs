@@ -4,6 +4,8 @@ import Control.Monad (when)
 import System.Environment (getArgs)
 import System.Console.Docopt
 import Data.List.Split
+import CG.Basic
+import CG.Intersect (intersect)
 
 patterns :: Docopt
 patterns = [docopt|
@@ -41,7 +43,6 @@ type UnparsedCommands = [(Char, [String])]
 type ParsedCommands = [(Char, Point)]
 type AreaName = String
 
-data Point = Point { xCoord::Double, yCoord::Double } deriving (Show)
 data Area = Area { areaName::AreaName, polygons::[[Point]] } deriving (Show)
 
 exampleData = "n abc\nM 1 2\nl 2 3\nL 1 2\nz\nM 1 2\nl 0 5\nz\nn efg\nM 0 0\nl 2 3\nz"
