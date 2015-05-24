@@ -1,0 +1,17 @@
+Baden-Württemberg 35751 Stuttgart
+Bayern 70550 München
+Berlin 892 Berlin
+Brandenburg 29655 Potsdam
+Bremen 419 Bremen
+Hamburg 755 Hamburg
+Hessen 21115 Wiesbaden
+Mecklenburg-Vorpommern 23211 Schwerin
+Niedersachsen 47614 Hannover
+Nordrhein-Westfalen 34110 Düsseldorf
+Rheinland-Pfalz 19854 Mainz
+Saarland 2569 Saarbrücken
+Sachsen 18420 Dresden
+Sachsen-Anhalt 20452 Magdeburg
+Schleswig-Holstein 15800 Kiel
+Thüringen 16173 Erfurt
+Bundesrepublik_Deutschland 357340 Berlin
