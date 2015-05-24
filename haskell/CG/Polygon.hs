@@ -2,6 +2,7 @@ module CG.Polygon
   ( calculatePolygonArea
   , calculateTriangleArea
   , numberOfIntersects
+  , toLines
   ) where
 
 import CG.Intersect
@@ -28,9 +29,3 @@ toLines ps@(_:ps') = zip ps ps'
 
 countTrueValues :: [Bool] -> Int
 countTrueValues = length . filter (==True)
-
-isHorizontalLineAtY :: Polygon -> Double -> Bool
-isHorizontalLineAtY ps y = foldr f False $ toLines ps
-  where
-    f :: Line -> Bool -> Bool
-    f (Point{yCoord=y1}, Point{yCoord=y2}) a = a || y == y1 && y1 == y2

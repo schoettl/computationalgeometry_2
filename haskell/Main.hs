@@ -5,8 +5,8 @@ import System.Environment (getArgs)
 import System.Console.Docopt
 import CG.Basic
 import CG.Intersect (intersect)
-import CG.Polygon (calculatePolygonArea, numberOfIntersects)
-import CG.CG2
+import CG.Polygon (calculatePolygonArea, numberOfIntersects, toLines)
+import CG.CG2Data
 
 patterns :: Docopt
 patterns = [docopt|area version 1.0
@@ -16,7 +16,7 @@ usage:
 
 options:
   -p, --points=<pointfile>  for each point in this file,
-      test in which area it is and output the result
+      test in which areas it is and output the result
 |]
 
 getArgOrExit = getArgOrExitWith patterns
@@ -25,14 +25,12 @@ main = do
   args <- parseArgsOrExit patterns =<< getArgs
 
   areaFile <- getArgOrExit args (argument "areafile")
-  content <- readFile areaFile
-  let areas = parseAreaData content
+  areas <- parseAreaDataFile areaFile
   printTuples $ zip areas (calculateAllAreas areas)
 
   when (isPresent args (longOption "points")) $ do
     pointFile <- getArgOrExit args (longOption "points")
-    content <- readFile pointFile
-    let places = parsePlaceData content
+    places <- parsePlaceDataFile pointFile
     putStrLn $ replicate 80 '='
     printTuples $ zip places $ map (areasContainingPlace areas) places
 
@@ -56,11 +54,22 @@ areasContainingPlace :: [Area] -> Place -> [Area]
 areasContainingPlace as p = areasContainingPoint as (coordinates p)
 
 containsPoint :: Area -> Point -> Bool
-containsPoint a@(Area{polygons=polygons}) p = odd $ sum $ map (flip numberOfIntersects line) polygons
-  where line = (Point { xCoord = minXOfArea a - 1, yCoord = yCoord p }, p)
+containsPoint a@(Area{polygons=polygons}) p = if not err 
+  then odd $ sum ns 
+  else error "containsPoint: cannot test. there is a horizontal line at y of point"
+  where 
+    ns = map (flip numberOfIntersects line) polygons
+    line = (Point { xCoord = minXOfArea a - 1, yCoord = yCoord p }, p)
+    err = any (isHorizontalLineAtY (yCoord p)) polygons
 
 minXOfArea :: Area -> Double
 minXOfArea Area{polygons=ps} = minimum $ map minX ps
 
 minX :: Polygon -> Double
 minX ps@(p:_) = foldr (\Point{xCoord=x} a -> min x a) (xCoord p) ps
+
+isHorizontalLineAtY :: Double -> Polygon -> Bool
+isHorizontalLineAtY y ps = foldr f False $ toLines ps
+  where
+    f :: Line -> Bool -> Bool
+    f (Point{yCoord=y1}, Point{yCoord=y2}) a = a || y == y1 && y1 == y2

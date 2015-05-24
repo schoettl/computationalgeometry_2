@@ -1,8 +1,9 @@
-module CG.CG2 ( parseAreaData
-              , parsePlaceData
-              , Area (..)
-              , Place (..)
-              ) where
+module CG.CG2Data
+  ( parseAreaDataFile
+  , parsePlaceDataFile
+  , Area (..)
+  , Place (..)
+  ) where
 
 import Data.List.Split
 import CG.Basic
@@ -19,18 +20,24 @@ instance Show Area where show = areaName
 instance Show Place where show = placeName
 
 
+parseAreaDataFile :: FilePath -> IO [Area]
+parseAreaDataFile f = fmap parseAreaData (readFile f)
+                       
 parseAreaData :: String -> [Area]
 parseAreaData = asAreas . convert . splitPolygons . groupData . parseData . readData
 
+
+parsePlaceDataFile :: FilePath -> IO [Place]
+parsePlaceDataFile f = fmap parsePlaceData (readFile f)
 
 parsePlaceData :: String -> [Place]
 parsePlaceData rawdata =
   let
     tokens = map words $ lines rawdata
   in map (\(n:x:y:[]) ->
-      Place { placeName = n
-            , coordinates = Point { xCoord = read x :: Double
-                                  , yCoord = read y :: Double }}
+              Place { placeName = n
+                    , coordinates = Point { xCoord = read x :: Double
+                                          , yCoord = read y :: Double }}
          ) tokens
 
 
@@ -79,6 +86,7 @@ interpreteList = foldl interpreteCommand []
 
 exampleData = "n abc\nM 1 2\nl 2 3\nL 1 2\nz\nM 1 2\nl 0 5\nz\nn efg\nM 0 0\nl 2 3\nz"
 
+
 testArea1 = Area { areaName = "Otterfing"
                  , polygons = [
                  [ Point { xCoord = 1, yCoord = 3 } -- ccw
@@ -101,5 +109,3 @@ testArea2 = Area { areaName = "Jakobs Haus"
                  , Point { xCoord = 3, yCoord = 2 }
                  , Point { xCoord = 2, yCoord = 3 }
                  ]]}
-
-
