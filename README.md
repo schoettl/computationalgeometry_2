@@ -9,7 +9,7 @@ Jedem Koordinatenpaar ist ein Buchstabe vorangestellt:
  * `M`: move to (absolute)
  * `l`: line to (relative)
  * `L`: line to (absolute)
- * `H`: horizontal line to (absolute) --dahinter steht nur eine Koordinate!
+ * `H`: horizontal line to (absolute) -- dahinter steht nur *eine* Koordinate!
 
 Außerdem gibt es:
 

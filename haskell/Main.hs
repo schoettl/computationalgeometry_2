@@ -7,16 +7,20 @@ import CG.Basic
 import CG.Intersect (intersect)
 import CG.Polygon (calculatePolygonArea, numberOfIntersects, toLines)
 import CG.CG2Data
+import Data.List.Split (splitOn)
 
 patterns :: Docopt
 patterns = [docopt|area version 1.0
 
 usage:
   area [ -p <pointfile> ] <areafile>
+  area [ -q <point> ] <areafile>
 
 options:
   -p, --points=<pointfile>  for each point in this file,
       test in which areas it is and output the result
+  -q, --point=<point>  for this point, test in which areas
+      it is and output the result (format: x,y e.g.  1.5,4.2)
 |]
 
 getArgOrExit = getArgOrExitWith patterns
@@ -34,6 +38,14 @@ main = do
     putStrLn $ replicate 80 '='
     printTuples $ zip places $ map (areasContainingPlace areas) places
 
+  when (isPresent args (longOption "point")) $ do
+    pointStr <- getArgOrExit args (longOption "point")
+    let splittedPointStr = splitOn "," pointStr
+        point = Point { xCoord = read (splittedPointStr!!0) :: Double
+                      , yCoord = read (splittedPointStr!!1) :: Double }
+        place = Place { placeName = "Place", coordinates = point }
+    putStrLn $ replicate 80 '='
+    printTuples [(place, areasContainingPlace areas place)]
 
 
 printTuples :: (Show a, Show b) => [(a, b)] -> IO ()
