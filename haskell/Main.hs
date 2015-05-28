@@ -46,12 +46,11 @@ calculateAllAreas = map calculateArea
 calculateArea :: Area -> Double
 calculateArea Area{polygons=ps} = abs $ sum $ map calculatePolygonArea ps
 
-
-areasContainingPoint :: [Area] -> Point -> [Area]
-areasContainingPoint as p = filter (flip containsPoint p) $ as
-
 areasContainingPlace :: [Area] -> Place -> [Area]
 areasContainingPlace as p = areasContainingPoint as (coordinates p)
+
+areasContainingPoint :: [Area] -> Point -> [Area]
+areasContainingPoint as p = filter (flip containsPoint p) as
 
 containsPoint :: Area -> Point -> Bool
 containsPoint a@(Area{polygons=polygons}) p = if not err 
@@ -66,7 +65,7 @@ minXOfArea :: Area -> Double
 minXOfArea Area{polygons=ps} = minimum $ map minX ps
 
 minX :: Polygon -> Double
-minX ps@(p:_) = foldr (\Point{xCoord=x} a -> min x a) (xCoord p) ps
+minX ps@(p:_) = foldr (\p a -> min (xCoord p) a) (xCoord p) ps
 
 isHorizontalLineAtY :: Double -> Polygon -> Bool
 isHorizontalLineAtY y ps = foldr f False $ toLines ps
