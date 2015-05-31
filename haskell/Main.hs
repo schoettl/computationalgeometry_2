@@ -77,7 +77,7 @@ minXOfArea :: Area -> Double
 minXOfArea Area{polygons=ps} = minimum $ map minX ps
 
 minX :: Polygon -> Double
-minX ps@(p:_) = foldr (\p a -> min (xCoord p) a) (xCoord p) ps
+minX (p:ps) =  foldr (\p a -> min (xCoord p) a) (xCoord p) ps
 
 isHorizontalLineAtY :: Double -> Polygon -> Bool
 isHorizontalLineAtY y ps = foldr f False $ toLines ps
