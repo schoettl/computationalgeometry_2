@@ -79,8 +79,7 @@ interpreteList = foldl interpreteCommand []
   where interpreteCommand a (c, p) = a ++ [p']
           where p'
                   | c == 'l'  = addPoints (last a) p
-                  | c == 'H'  = Point { xCoord = xCoord p
-                                      , yCoord = yCoord (last a) }
+                  | c == 'H'  = Point (xCoord p) (yCoord $ last a)
                   | otherwise = p
 
 
