@@ -101,7 +101,12 @@ zweimal in der Liste stehen muss, nämlich am Anfang und am Ende.
 Fläche berechnen
 ----------------
 
-
+Ein oder mehrere Polygone definieren eine Fläche.  Für jedes Segment der
+Polygone wird die Dreiecksfläche zum Ursprung berechnet.  Diese Flächen werden
+aufaddiert.  Das funktioniert genauso, wenn eine Fläche aus mehreren Polygonen
+besteht, weil die Polygone passend orientiert sind.  Zum Beispiel ist ein
+inneres Polygon, das aus der umgebenden Fläche ein Stück herausschneidet,
+clockwise orientiert, wenn das äußere Polygon counter-clockwise orientiert ist.
 
 
 Test in welcher Fläche ein Punkt liegt
@@ -125,4 +130,14 @@ gehabt).
 Test unserer Ergebnisse
 -----------------------
 
+Zum Testen unseres Programms haben wir zwei Polygone aufgezeichnet und dessen
+Punkte abgespeichert in der Datei `test/test.txt`.  Da funktioniert das
+Programm schon mal richtig.
 
+Außerdem haben wir zum Testen unserer Ergebnisse die Verhältnisse zur
+Gesamtfläche berechnet.  Diese können mit den echten Größenverhältnissen
+verglichen werden.  Die Daten dazu haben wir aus Wikipedia und in der Datei
+`test/bundeslaender.txt` abgelegt.
+
+Zum Test steht ein Skript zur Verfügung.  Aufruf: `test/test-brd.sh` (vorher
+`make` aufrufen!)
